@@ -16,8 +16,15 @@ namespace IngressoMVC.Controllers
         }
 
         public IActionResult Index() => View(_context.Filmes);
+        public IActionResult Listar() => View(_context.Filmes);
 
-        public IActionResult Detalhes(int id) => View(_context.Filmes.Find(id));
+        public IActionResult Detalhes(int id)
+        {
+            var result = _context.Filmes.FirstOrDefault(x => x.Id == id);
+            if (result == null)
+                return View("NotFound");
+            return View(_context.Filmes.Find(id));
+        }
 
         public IActionResult Criar() => View();
 
@@ -37,9 +44,9 @@ namespace IngressoMVC.Controllers
             _context.Add(filme);
             _context.SaveChanges();
 
-            foreach (var categoria in filmeDto.Categorias)
+            foreach (var categoria in filmeDto.CategoriasId)
             {
-                int? categoriaId = _context.Categorias.Where(c => c.Nome == categoria).FirstOrDefault().Id;
+                int? categoriaId = _context.Categorias.Where(c => c.Id == categoria).FirstOrDefault().Id;
 
                 if (categoriaId != null)
                 {
@@ -56,7 +63,7 @@ namespace IngressoMVC.Controllers
                 _context.SaveChanges();
             }
 
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Listar));
         }
 
         public IActionResult Atualizar(int id)
